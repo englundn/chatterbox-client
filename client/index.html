@@ -26,11 +26,13 @@
       <!-- Your HTML goes here! -->
       <select id='roomSelect'></select>
       <div id = 'chats'></div><br>
-      <input type="text">
-      <button class='submitB' type="button"> Submit </button>
-      <button class='clearB' type="button"> Clear </button>
+      <input id='message' type='text'>
+      <div id='send'>
+        <input class='submit' type='submit' value='Submit'>
+        <input class='clear' type='submit' value='Clear'>
+      </div>
     </div>
-    <script src="env/config.js"></script>
-    <script src="scripts/app.js"></script>
+    <script src='env/config.js'></script>
+    <script src='scripts/app.js'></script>
   </body>
 </html>

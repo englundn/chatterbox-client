@@ -1,9 +1,27 @@
 // YOUR CODE HERE:
 var app = {};
 
+app.friends = {};
+
 app.server = 'https://api.parse.com/1/classes/messages';
 var roomName = 'default room';
 
+
+
+var entityMap = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': '&quot;',
+  "'": '&#39;',
+  "/": '&#x2F;'
+};
+
+var escapeHtml = function(string) {
+  return String(string).replace(/[&<>"'\/]/g, function (s) {
+    return '';
+  });
+};
 
 app.init = function() {
 };
@@ -16,27 +34,32 @@ app.renderRoom = function(roomName) {
 
 
 //    SUBMIT MESSAGES
-
-$('.submitB').on('click', function() {
+app.handleSubmit = function() {
+  console.log('submit');
   var message = messageMaker($('input').val());
   app.send(message);
   app.renderMessage(message);
-});
+};
+
+$('#send .submit').on('submit', app.handleSubmit);
+
 
 app.send = function(message) {
   $.ajax({
     url: app.server,
     type: 'POST',
     data: JSON.stringify(message),
-    datatype: 'jsonp',
-    success: console.log('success')
+    datatype: 'jsonp'
   });
-  $('input').val('');
+  $('#message').val('');
 };
 
 app.renderMessage = function(message) {
-  var string = '<div class="username"><span class="username">' + message.username + '</span><span class="message">: ' + message.text + '</span></div>';
+  var string = '<div><span class="username">' + escapeHtml(message.username) + '</span><span class="message">: ' + escapeHtml(message.text) + '</span></div>';
   $('#chats').append(string);
+  $('.username').click(function() {
+    app.handleUsernameClick($(this));
+  });
 };
 
 var messageMaker = function(message) {
@@ -49,7 +72,7 @@ var messageMaker = function(message) {
 
 //     CLEAR MESSAGES
 
-$('.clearB').on('click', function() {
+$('.clear').on('click', function() {
   app.clearMessages();
 });
 
@@ -65,28 +88,32 @@ app.fetch = function() {
   $.ajax({
     url: app.server,
     type: 'GET',
+    data: {order: '-createdAt'},
     success: function (result) {
+      // console.log(result);
       messageGetter(result);
-      console.log('success');
     }
   });
 };
 
+// setInterval(app.fetch, 200);
+
 var messageGetter = function(input) {
+  console.log(input);
+
   input.results.forEach(function(message) {
-    var string = '<div class="username"><span class="username">' + message.username + '</span><span class="message">: ' + message.text + '</span></div>';
+    var string = '<div><span class="username">' + escapeHtml(message.username) + '</span><span class="message">: ' + escapeHtml(message.text) + '</span></div>';
     $('#chats').append(string);
+  });
+  $('.username').click(function() {
+    app.handleUsernameClick($(this));
   });
 };
 
-//    ADD FRIENDS
 
-
-$('.username').click(function(argument) {
-  console.log('HELLO');
-});
-
-
+app.handleUsernameClick = function(event) {
+  app.friends[event.text()] = event.text();
+};
 
 
 
