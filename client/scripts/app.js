@@ -3,7 +3,6 @@ var app = {};
 
 app.myName = window.location.search.slice(10);
 app.friends = {};
-app.friends[app.myName] = app.myName;
 app.rooms = {};
 
 app.server = 'https://api.parse.com/1/classes/messages';
@@ -47,10 +46,24 @@ var addRoom = function(input) {
   Object.keys(app.rooms).forEach(app.renderRoom);
 };
 
+var createRoom = function(room) {
+  if (!app.rooms.hasOwnProperty(room)) { 
+    app.rooms[room] = room;
+    app.renderRoom(room);
+    $('#roomSelect').val(room);
+    app.fetch();
+  }
+};
+
+$('.roomSubmit').on('click', function() {
+  createRoom($('#roomCreate').val());
+  $('#roomCreate').val('');
+});
 
 //    SUBMIT MESSAGES
 app.handleSubmit = function() {
-  var message = messageMaker($('input').val());
+  var message = messageMaker($('#message').val());
+  console.log(message);
   if (message.text.length) { 
     app.send(message);
     app.renderMessage(message);
@@ -58,7 +71,6 @@ app.handleSubmit = function() {
 };
 
 $('#send .submit').on('click', app.handleSubmit);
-
 
 app.send = function(message) {
   $.ajax({
@@ -78,7 +90,9 @@ $('#message').keypress(function (e) {
 });
 
 app.renderMessage = function(message) {
-  var string = '<div><span class="username">' + escapeHtml(message.username) + '</span><span class="message">: ' + escapeHtml(message.text) + '</span></div>';
+  var friendly = app.friends.hasOwnProperty(escapeHtml(message.username)) ? '<div class = "friendly">' : '<div>';
+  console.log('a');
+  var string = friendly + '<span class="username">' + escapeHtml(message.username) + '</span><span class="message">: ' + escapeHtml(message.text) + '</span></div>';
   $('#chats').prepend(string);
   $('.username').click(function() {
     app.handleUsernameClick($(this));
@@ -124,9 +138,12 @@ app.fetch = function() {
 };
 
 var messageGetter = function(input) {
+  $('#chats').empty();
+  console.log('getter');
   input.results.forEach(function(message) {
     if (app.currentRoom === escapeHtml(message.roomname)) {
-      var string = '<div><span class="username">' + escapeHtml(message.username) + '</span><span class="message">: ' + escapeHtml(message.text) + '</span></div>';
+      var friendly = app.friends.hasOwnProperty(escapeHtml(message.username)) ? '<div class = "friendly">' : '<div>';
+      var string = friendly + '<span class="username">' + escapeHtml(message.username) + '</span><span class="message">: ' + escapeHtml(message.text) + '</span></div>';
       $('#chats').append(string);
     }
   });
@@ -135,13 +152,16 @@ var messageGetter = function(input) {
   });
 };
 
-//
+// ADD FRIENDS
 
 app.handleUsernameClick = function(event) {
   var oldLength = Object.keys(app.friends).length;
-  app.friends[event.text()] = event.text();
+  if ( event.text() !== app.myName) {
+    app.friends[event.text()] = event.text();
+  }
   if (Object.keys(app.friends).length !== oldLength) {
     $('#friends').append('<div>' + event.text() + '</div>');
+    app.fetch();
   }
 };
 

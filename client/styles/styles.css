@@ -98,3 +98,10 @@ form input[type=text] {
     background-color: #0090da;
 }
 
+.friendly{
+    font-weight: bold;
+}
+
+#message{
+    width: 400px;
+}
