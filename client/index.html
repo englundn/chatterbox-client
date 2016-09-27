@@ -24,11 +24,12 @@
     <div id="main">
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
-      <textarea class = 'chat'></textarea><br>
+      <select id='roomSelect'></select>
+      <div id = 'chats'></div><br>
       <input type="text">
-      <button type="button"> Submit </button>
+      <button class='submitB' type="button"> Submit </button>
+      <button class='clearB' type="button"> Clear </button>
     </div>
-    <div id="chats"></div>
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
   </body>
