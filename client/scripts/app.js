@@ -7,22 +7,6 @@ app.rooms = {};
 
 app.server = 'https://api.parse.com/1/classes/messages';
 
-
-var entityMap = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': '&quot;',
-  "'": '&#39;',
-  "/": '&#x2F;'
-};
-
-var escapeHtml = function(string) {
-  return String(string).replace(/[&<>"'\/]/g, function (s) {
-    return '';
-  });
-};
-
 app.init = function() {
   app.fetch();
 };
@@ -30,7 +14,9 @@ app.init = function() {
 //    SET UP ROOMS
 
 app.renderRoom = function(roomName) {
-  $('#roomSelect').append($('<option>' + roomName + '</option>').val(roomName));
+  var cleanRoom = $('<option/>');
+  cleanRoom.text(roomName).appendTo(cleanRoom);
+  $('#roomSelect').append(cleanRoom);
 };
 
 $('#roomSelect').change(function() {
@@ -40,7 +26,7 @@ $('#roomSelect').change(function() {
 
 var addRoom = function(input) {
   input.results.forEach(function(message) {
-    var roomName = escapeHtml(message.roomname);
+    var roomName = message.roomname;
     app.rooms[roomName] = roomName;
   });
   Object.keys(app.rooms).forEach(app.renderRoom);
@@ -63,7 +49,6 @@ $('.roomSubmit').on('click', function() {
 //    SUBMIT MESSAGES
 app.handleSubmit = function() {
   var message = messageMaker($('#message').val());
-  console.log(message);
   if (message.text.length) { 
     app.send(message);
     app.renderMessage(message);
@@ -90,10 +75,15 @@ $('#message').keypress(function (e) {
 });
 
 app.renderMessage = function(message) {
-  var friendly = app.friends.hasOwnProperty(escapeHtml(message.username)) ? '<div class = "friendly">' : '<div>';
-  console.log('a');
-  var string = friendly + '<span class="username">' + escapeHtml(message.username) + '</span><span class="message">: ' + escapeHtml(message.text) + '</span></div>';
-  $('#chats').prepend(string);
+
+  var friendly = app.friends.hasOwnProperty(user) ? $('<div class = "friendly" />') : $('<div />');
+  
+  var user = $('<span class="username" />');
+  user.text(message.username).appendTo(user);
+  var text = $('<span class="message" />');
+  text.text(message.text).appendTo(text);
+  friendly.append(user).append(': ').append(text);
+  $('#chats').prepend(friendly);
   $('.username').click(function() {
     app.handleUsernameClick($(this));
   });
@@ -141,10 +131,8 @@ var messageGetter = function(input) {
   $('#chats').empty();
   console.log('getter');
   input.results.forEach(function(message) {
-    if (app.currentRoom === escapeHtml(message.roomname)) {
-      var friendly = app.friends.hasOwnProperty(escapeHtml(message.username)) ? '<div class = "friendly">' : '<div>';
-      var string = friendly + '<span class="username">' + escapeHtml(message.username) + '</span><span class="message">: ' + escapeHtml(message.text) + '</span></div>';
-      $('#chats').append(string);
+    if (app.currentRoom === message.roomname) {
+      app.renderMessage(message);
     }
   });
   $('.username').click(function() {
