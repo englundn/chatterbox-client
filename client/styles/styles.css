@@ -28,7 +28,7 @@ body {
     justify-content: center;
     flex-direction: column;
     border-style: solid;
-    border-color: black;
+    border-color: transparent;
     border-radius: 15px;
     font-size: 15px;
     text-align: left;
