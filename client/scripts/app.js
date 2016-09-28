@@ -1,15 +1,18 @@
 // YOUR CODE HERE:
-var app = {};
+var app = {
+  server: 'https://api.parse.com/1/classes/messages',
+  myName: window.location.search.slice(10),
+  friends: {},
+  rooms: {}, 
+  
+  init: function() {
+    app.fetch();
+    setInterval(app.fetch, 3000);
+  }
 
-app.myName = window.location.search.slice(10);
-app.friends = {};
-app.rooms = {};
-
-app.server = 'https://api.parse.com/1/classes/messages';
-
-app.init = function() {
-  app.fetch();
 };
+
+
 
 //    SET UP ROOMS
 
@@ -26,14 +29,14 @@ $('#roomSelect').change(function() {
 
 var addRoom = function(input) {
   input.results.forEach(function(message) {
-    var roomName = message.roomname;
+    var roomName = message.roomname || 'lobby';
     app.rooms[roomName] = roomName;
   });
   Object.keys(app.rooms).forEach(app.renderRoom);
 };
 
 var createRoom = function(room) {
-  if (!app.rooms.hasOwnProperty(room)) { 
+  if (!app.rooms.hasOwnProperty(room) && room) { 
     app.rooms[room] = room;
     app.renderRoom(room);
     $('#roomSelect').val(room);
@@ -76,13 +79,14 @@ $('#message').keypress(function (e) {
 
 app.renderMessage = function(message) {
 
-  var friendly = app.friends.hasOwnProperty(user) ? $('<div class = "friendly" />') : $('<div />');
-  
   var user = $('<span class="username" />');
   user.text(message.username).appendTo(user);
   var text = $('<span class="message" />');
   text.text(message.text).appendTo(text);
+  
+  var friendly = app.friends.hasOwnProperty(user.text()) ? $('<div class = "friendly" />') : $('<div/>');
   friendly.append(user).append(': ').append(text);
+
   $('#chats').prepend(friendly);
   $('.username').click(function() {
     app.handleUsernameClick($(this));
@@ -112,7 +116,6 @@ app.clearMessages = function() {
 //     FETCH MESSAGES
 
 app.fetch = function() {
-  console.log('fetched');
   $.ajax({
     url: app.server,
     type: 'GET',
@@ -120,6 +123,7 @@ app.fetch = function() {
     success: function (result) {
       if (!(Object.keys(app.rooms).length)) {
         addRoom(result);
+        $('#roomSelect').val('lobby');
       }
       app.currentRoom = $('#roomSelect').val();
       messageGetter(result);
@@ -128,9 +132,8 @@ app.fetch = function() {
 };
 
 var messageGetter = function(input) {
-  $('#chats').empty();
-  console.log('getter');
-  input.results.forEach(function(message) {
+  app.clearMessages();
+  input.results.reverse().forEach(function(message) {
     if (app.currentRoom === message.roomname) {
       app.renderMessage(message);
     }
@@ -148,7 +151,7 @@ app.handleUsernameClick = function(event) {
     app.friends[event.text()] = event.text();
   }
   if (Object.keys(app.friends).length !== oldLength) {
-    $('#friends').append('<div>' + event.text() + '</div>');
+    $('.friend').append('<div>' + event.text() + '</div>');
     app.fetch();
   }
 };

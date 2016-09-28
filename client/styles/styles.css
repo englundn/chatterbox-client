@@ -6,22 +6,32 @@ body {
 }
 
 #main {
-    width: 500px;
+    width: 100%
     margin: auto;
-    text-align: left;
-    background: white;
+    text-align: center;
+    align-content: center;
+    background-image: url('http://i.imgur.com/vrq2hHl.jpg');
+    background-size: contain;
     padding: 50px 60px;
     border: solid #ddd;
     border-width: 0 1px 1px 1px;
+    border-radius: 5px;
+
 }
 
 #chats{
-    width: 400px;
+    margin-top: 10px;
+    margin-left: 25%
+    width: 50%;
     height: 500px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     border-style: solid;
     border-color: black;
+    border-radius: 15px;
     font-size: 15px;
-    text-align: center;
+    text-align: left;
     overflow-y:scroll;
 }
 #main h1 {
@@ -29,6 +39,8 @@ body {
     font-size: 35px;
     margin-bottom: 5px;
     padding: 5px;
+    color: white;
+
 }
 
 #main h1 span {
@@ -94,8 +106,8 @@ form input[type=text] {
 }
 
 .friend {
+    margin-top: 10px;
     color: #fff;
-    background-color: #0090da;
 }
 
 .friendly{
@@ -104,4 +116,15 @@ form input[type=text] {
 
 #message{
     width: 400px;
+}
+
+#chats div{
+    margin: 5px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: white;
+    opacity: .6;
+}
+.message {
+    text-align: center;
 }
